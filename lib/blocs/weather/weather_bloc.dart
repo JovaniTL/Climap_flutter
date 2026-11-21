@@ -1,4 +1,4 @@
-import 'package:climap_flutter/blocs/weather/weather_even.dart';
+import 'package:climap_flutter/blocs/weather/weather_event.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 import '../../core/utils/avatar_state_mapper.dart';

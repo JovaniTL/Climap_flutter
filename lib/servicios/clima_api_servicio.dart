@@ -39,6 +39,8 @@ class ClimaApiServicio {
   ClimaApiServicio({http.Client? clienteHttp})
       : _clienteHttp = clienteHttp ?? http.Client();
 
+  void cerrar() => _clienteHttp.close();
+
   /// Busca ciudades que coincidan con el texto ingresado por el usuario.
   Future<List<CiudadModelo>> buscarCiudades(String nombreCiudad) async {
     final consulta = nombreCiudad.trim();
@@ -82,6 +84,16 @@ class ClimaApiServicio {
       throw const ClimaExcepcion(
         mensaje: 'Sin conexión a internet. Revisa tu red Wi-Fi o datos móviles.',
         tipo: TipoErrorClima.sinInternet,
+      );
+    } on http.ClientException {
+      throw const ClimaExcepcion(
+        mensaje: 'No se pudo conectar con el servicio. Verifica tu conexión a internet.',
+        tipo: TipoErrorClima.sinInternet,
+      );
+    } on FormatException {
+      throw const ClimaExcepcion(
+        mensaje: 'El servicio de búsqueda devolvió una respuesta no válida.',
+        tipo: TipoErrorClima.errorServidor,
       );
     } on TimeoutException {
       throw const ClimaExcepcion(
@@ -141,6 +153,16 @@ class ClimaApiServicio {
       throw const ClimaExcepcion(
         mensaje: 'Sin conexión a internet. No se pudo obtener el pronóstico del clima.',
         tipo: TipoErrorClima.sinInternet,
+      );
+    } on http.ClientException {
+      throw const ClimaExcepcion(
+        mensaje: 'No se pudo conectar con el servicio meteorológico. Verifica tu conexión.',
+        tipo: TipoErrorClima.sinInternet,
+      );
+    } on FormatException {
+      throw const ClimaExcepcion(
+        mensaje: 'El servidor meteorológico devolvió una respuesta no válida.',
+        tipo: TipoErrorClima.errorServidor,
       );
     } on TimeoutException {
       throw const ClimaExcepcion(

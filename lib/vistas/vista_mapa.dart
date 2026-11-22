@@ -23,17 +23,20 @@ class VistaMapa extends StatefulWidget {
 
 class _VistaMapaState extends State<VistaMapa> {
   late final MapController _mapController;
+  late final ClimaApiServicio _servicio;
   bool _consultando = false;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
+    _servicio = ClimaApiServicio();
   }
 
   @override
   void dispose() {
     _mapController.dispose();
+    _servicio.cerrar();
     super.dispose();
   }
 
@@ -46,8 +49,7 @@ class _VistaMapaState extends State<VistaMapa> {
     setState(() => _consultando = true);
 
     try {
-      final servicio = ClimaApiServicio();
-      final clima = await servicio.obtenerClima(
+      final clima = await _servicio.obtenerClima(
         latitud: lat,
         longitud: lon,
         nombreLugar: 'Ubicación seleccionada (${lat.toStringAsFixed(2)}, ${lon.toStringAsFixed(2)})',
@@ -76,8 +78,14 @@ class _VistaMapaState extends State<VistaMapa> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        final icono = ClimaTraductor.obtenerIcono(clima.codigoClima);
-        final descripcion = ClimaTraductor.obtenerDescripcion(clima.codigoClima);
+        final icono = ClimaTraductor.obtenerIcono(
+          clima.codigoClima,
+          esDeDia: clima.esDeDia,
+        );
+        final descripcion = ClimaTraductor.obtenerDescripcion(
+          clima.codigoClima,
+          esDeDia: clima.esDeDia,
+        );
 
         return Container(
           padding: const EdgeInsets.all(20),
@@ -185,7 +193,7 @@ class _VistaMapaState extends State<VistaMapa> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.app_clima',
+                userAgentPackageName: 'com.example.climap_flutter',
               ),
             ],
           ),

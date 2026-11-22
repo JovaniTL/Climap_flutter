@@ -1,96 +1,73 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:path_provider/path_provider.dart';
 
-import 'blocs/audio/audio_cubit.dart';
-import 'blocs/weather/weather_bloc.dart';
-import 'repositories/weather_repository.dart';
-import 'services/audio_service.dart';
-import 'ui/screens/weather_map_screen.dart';
+import 'bloc/clima_bloc.dart';
+import 'bloc/comparacion_cubit.dart';
+import 'vistas/pantalla_principal.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final storageDirectory = kIsWeb
-      ? HydratedStorage.webStorageDirectory
-      : await getApplicationDocumentsDirectory();
-
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: storageDirectory,
-  );
-
-  final weatherRepository = WeatherRepository();
-  final audioService = AudioService();
-
-  runApp(
-    WeatherAvatarApp(
-      weatherRepository: weatherRepository,
-      audioService: audioService,
-    ),
-  );
+  runApp(const MiAplicacionClima());
 }
 
-class WeatherAvatarApp extends StatefulWidget {
-  final WeatherRepository weatherRepository;
-  final AudioService audioService;
-
-  const WeatherAvatarApp({
-    super.key,
-    required this.weatherRepository,
-    required this.audioService,
-  });
-
-  @override
-  State<WeatherAvatarApp> createState() => _WeatherAvatarAppState();
-}
-
-class _WeatherAvatarAppState extends State<WeatherAvatarApp> {
-  late final WeatherBloc _weatherBloc;
-  late final AudioCubit _audioCubit;
-
-  @override
-  void initState() {
-    super.initState();
-    _weatherBloc = WeatherBloc(repository: widget.weatherRepository);
-    _audioCubit = AudioCubit(
-      onPlayLoop: widget.audioService.playLoop,
-      onPauseLoop: widget.audioService.pause,
-      onSetMuted: widget.audioService.setMuted,
-    );
-  }
-
-  @override
-  void dispose() {
-    _weatherBloc.close();
-    _audioCubit.close();
-    widget.audioService.dispose();
-    super.dispose();
-  }
+/// Punto de entrada de la aplicación.
+/// Inyecta los BLoCs globales (ClimaBloc y ComparacionCubit) para que estén
+/// disponibles en cualquier pantalla.
+class MiAplicacionClima extends StatelessWidget {
+  const MiAplicacionClima({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<WeatherBloc>.value(value: _weatherBloc),
-        BlocProvider<AudioCubit>.value(value: _audioCubit),
+        BlocProvider<ClimaBloc>(
+          create: (_) => ClimaBloc(),
+        ),
+        BlocProvider<ComparacionCubit>(
+          create: (_) => ComparacionCubit(),
+        ),
       ],
       child: MaterialApp(
-        title: 'Clima y Avatar',
+        title: 'App Clima',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
-          colorSchemeSeed: const Color(0xFF0284C7),
-          brightness: Brightness.light,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blueAccent,
+            brightness: Brightness.light,
+          ),
+          cardTheme: CardThemeData(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          appBarTheme: const AppBarTheme(
+            centerTitle: true,
+            elevation: 0,
+            scrolledUnderElevation: 1,
+          ),
         ),
         darkTheme: ThemeData(
           useMaterial3: true,
-          colorSchemeSeed: const Color(0xFF0284C7),
-          brightness: Brightness.dark,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blueAccent,
+            brightness: Brightness.dark,
+          ),
+          cardTheme: CardThemeData(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          appBarTheme: const AppBarTheme(
+            centerTitle: true,
+            elevation: 0,
+            scrolledUnderElevation: 1,
+          ),
         ),
         themeMode: ThemeMode.system,
-        home: const WeatherMapScreen(),
+        home: const PantallaPrincipal(),
       ),
     );
   }

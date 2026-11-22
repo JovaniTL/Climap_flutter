@@ -30,14 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.8
   flutter_bloc: ^8.1.6
-  hydrated_bloc: ^9.1.5
-  path_provider: ^2.1.4
-  http: ^1.2.2
   equatable: ^2.0.5
-  just_audio: ^0.10.6
-  weather_icons: ^3.0.0
-  rive: ^0.13.20
+  http: ^1.2.2
   flutter_map: ^8.3.2
   latlong2: ^0.9.1
 
@@ -45,24 +41,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
-  assets:
-    - assets/audio/
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/imagenes/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

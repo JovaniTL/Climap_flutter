@@ -94,11 +94,14 @@ class VistaClimaPrincipal extends StatelessWidget {
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 32),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 32),
                                 child: Text(
                                   'Escribe el nombre de tu ciudad arriba (ej. Zitácuaro, Morelia, CDMX) y pulsa "Buscar" para obtener el clima, recomendaciones y el monito interactivo.',
-                                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -270,7 +273,10 @@ class _ConstruirVistaError extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               mensaje,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             if (onReintentar != null) ...[

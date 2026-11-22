@@ -82,7 +82,7 @@ class ListaRecomendacionesWidget extends StatelessWidget {
                           rec.descripcion,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade700,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             height: 1.3,
                           ),
                         ),

@@ -130,7 +130,10 @@ class _VistaMapaState extends State<VistaMapa> {
                         ),
                         Text(
                           '$descripcion • ${clima.temperatura.round()}°C (Sensación ${clima.sensacionTermica.toStringAsFixed(1)}°C)',
-                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),

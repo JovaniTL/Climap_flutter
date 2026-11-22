@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../servicios/clima_api_servicio.dart';
@@ -9,10 +8,12 @@ import 'clima_state.dart';
 /// BLoC principal para gestionar el estado del clima, las sugerencias y los errores.
 class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
   final ClimaApiServicio _servicio;
+  final bool _esServicioPropio;
   int _idSolicitudSugerencias = 0;
 
   ClimaBloc({ClimaApiServicio? servicio})
       : _servicio = servicio ?? ClimaApiServicio(),
+        _esServicioPropio = servicio == null,
         super(const ClimaEstado()) {
     on<BuscarSugerenciasEvent>(_onBuscarSugerencias);
     on<LimpiarSugerenciasEvent>(_onLimpiarSugerencias);
@@ -242,5 +243,13 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     if (ultimoEvento != null) {
       add(ultimoEvento);
     }
+  }
+
+  @override
+  Future<void> close() {
+    if (_esServicioPropio) {
+      _servicio.cerrar();
+    }
+    return super.close();
   }
 }

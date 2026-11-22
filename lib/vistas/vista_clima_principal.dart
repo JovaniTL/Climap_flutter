@@ -75,7 +75,7 @@ class VistaClimaPrincipal extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
+                                  color: Colors.blue.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -247,7 +247,7 @@ class _ConstruirVistaError extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -259,7 +259,7 @@ class _ConstruirVistaError extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(icono, size: 54, color: color),

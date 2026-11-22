@@ -17,10 +17,10 @@ class MonitoClimaWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: datosMonito.colorFondo.withOpacity(0.12),
+        color: datosMonito.colorFondo.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: datosMonito.colorFondo.withOpacity(0.3),
+          color: datosMonito.colorFondo.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -33,7 +33,7 @@ class MonitoClimaWidget extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  datosMonito.colorFondo.withOpacity(0.8),
+                  datosMonito.colorFondo.withValues(alpha: 0.8),
                   datosMonito.colorFondo,
                 ],
                 begin: Alignment.topLeft,
@@ -42,7 +42,7 @@ class MonitoClimaWidget extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: datosMonito.colorFondo.withOpacity(0.35),
+                  color: datosMonito.colorFondo.withValues(alpha: 0.35),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -93,7 +93,7 @@ class MonitoClimaWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: datosMonito.colorFondo.withOpacity(0.2),
+                    color: datosMonito.colorFondo.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -118,7 +118,7 @@ class MonitoClimaWidget extends StatelessWidget {
                   datosMonito.descripcion,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                   ),
                 ),
               ],

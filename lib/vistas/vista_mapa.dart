@@ -94,7 +94,7 @@ class _VistaMapaState extends State<VistaMapa> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 16,
               ),
             ],
@@ -233,11 +233,11 @@ class _VistaMapaState extends State<VistaMapa> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor.withOpacity(0.92),
+                color: Theme.of(context).cardColor.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

@@ -53,7 +53,7 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
@@ -152,7 +152,7 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
+                      color: Colors.black.withValues(alpha: 0.12),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),

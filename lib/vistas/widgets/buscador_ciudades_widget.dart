@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,15 +17,18 @@ class BuscadorCiudadesWidget extends StatefulWidget {
 class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
   final TextEditingController _controladorTexto = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controladorTexto.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
   void _enviarBusqueda() {
+    _debounce?.cancel();
     final texto = _controladorTexto.text.trim();
     if (texto.isNotEmpty) {
       _focusNode.unfocus();
@@ -60,7 +64,16 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
                       focusNode: _focusNode,
                       textInputAction: TextInputAction.search,
                       onChanged: (valor) {
-                        context.read<ClimaBloc>().add(BuscarSugerenciasEvent(valor));
+                        _debounce?.cancel();
+                        if (valor.trim().length < 2) {
+                          context.read<ClimaBloc>().add(const LimpiarSugerenciasEvent());
+                          return;
+                        }
+                        final bloc = context.read<ClimaBloc>();
+                        _debounce = Timer(const Duration(milliseconds: 350), () {
+                          if (!mounted) return;
+                          bloc.add(BuscarSugerenciasEvent(valor));
+                        });
                       },
                       onSubmitted: (_) => _enviarBusqueda(),
                       decoration: InputDecoration(
@@ -70,16 +83,22 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
                           color: Colors.grey.shade500,
                         ),
                         prefixIcon: const Icon(Icons.search_rounded),
-                        suffixIcon: _controladorTexto.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 20),
-                                onPressed: () {
-                                  _controladorTexto.clear();
-                                  context.read<ClimaBloc>().add(const LimpiarSugerenciasEvent());
-                                  setState(() {});
-                                },
-                              )
-                            : null,
+                        suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: _controladorTexto,
+                          builder: (context, valor, _) {
+                            if (valor.text.isEmpty) return const SizedBox.shrink();
+                            return IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 20),
+                              onPressed: () {
+                                _debounce?.cancel();
+                                _controladorTexto.clear();
+                                context
+                                    .read<ClimaBloc>()
+                                    .add(const LimpiarSugerenciasEvent());
+                              },
+                            );
+                          },
+                        ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -127,6 +146,7 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
             if (state.sugerencias.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 8),
+                constraints: const BoxConstraints(maxHeight: 240),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
@@ -138,32 +158,35 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
                     ),
                   ],
                 ),
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: state.sugerencias.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final ciudad = state.sugerencias[index];
-                    return ListTile(
-                      dense: true,
-                      leading: const Icon(Icons.location_on_outlined, color: Colors.blueAccent),
-                      title: Text(
-                        ciudad.nombre,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        ciudad.nombreCompleto,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onTap: () {
-                        _controladorTexto.text = ciudad.nombre;
-                        _focusNode.unfocus();
-                        context.read<ClimaBloc>().add(SeleccionarCiudadSugeridaEvent(ciudad));
-                      },
-                    );
-                  },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: state.sugerencias.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final ciudad = state.sugerencias[index];
+                      return ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.location_on_outlined, color: Colors.blueAccent),
+                        title: Text(
+                          ciudad.nombre,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          ciudad.nombreCompleto,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onTap: () {
+                          _debounce?.cancel();
+                          _controladorTexto.text = ciudad.nombre;
+                          _focusNode.unfocus();
+                          context.read<ClimaBloc>().add(SeleccionarCiudadSugeridaEvent(ciudad));
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
           ],

@@ -9,6 +9,7 @@ import 'clima_state.dart';
 /// BLoC principal para gestionar el estado del clima, las sugerencias y los errores.
 class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
   final ClimaApiServicio _servicio;
+  int _idSolicitudSugerencias = 0;
 
   ClimaBloc({ClimaApiServicio? servicio})
       : _servicio = servicio ?? ClimaApiServicio(),
@@ -26,6 +27,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     BuscarSugerenciasEvent event,
     Emitter<ClimaEstado> emit,
   ) async {
+    final idSolicitud = ++_idSolicitudSugerencias;
     final texto = event.texto.trim();
     if (texto.length < 2) {
       emit(state.copyWith(sugerencias: const [], cargandoSugerencias: false));
@@ -36,8 +38,10 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
 
     try {
       final ciudades = await _servicio.buscarCiudades(texto);
+      if (idSolicitud != _idSolicitudSugerencias) return;
       emit(state.copyWith(sugerencias: ciudades, cargandoSugerencias: false));
     } catch (_) {
+      if (idSolicitud != _idSolicitudSugerencias) return;
       // Si falla la búsqueda rápida de sugerencias, simplemente dejamos la lista vacía
       emit(state.copyWith(sugerencias: const [], cargandoSugerencias: false));
     }
@@ -48,6 +52,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     LimpiarSugerenciasEvent event,
     Emitter<ClimaEstado> emit,
   ) {
+    _idSolicitudSugerencias++;
     emit(state.copyWith(sugerencias: const [], cargandoSugerencias: false));
   }
 
@@ -56,6 +61,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     ConsultarClimaPorTextoEvent event,
     Emitter<ClimaEstado> emit,
   ) async {
+    _idSolicitudSugerencias++;
     final texto = event.nombreCiudad.trim();
     if (texto.isEmpty) {
       emit(
@@ -125,6 +131,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     SeleccionarCiudadSugeridaEvent event,
     Emitter<ClimaEstado> emit,
   ) async {
+    _idSolicitudSugerencias++;
     final ciudad = event.ciudad;
 
     emit(
@@ -177,6 +184,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     ConsultarClimaPorCoordenadasEvent event,
     Emitter<ClimaEstado> emit,
   ) async {
+    _idSolicitudSugerencias++;
     final nombre = event.nombreLugar ??
         'Coordenadas (${event.latitud.toStringAsFixed(2)}, ${event.longitud.toStringAsFixed(2)})';
 

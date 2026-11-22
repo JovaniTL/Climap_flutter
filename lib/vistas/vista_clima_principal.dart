@@ -55,9 +55,13 @@ class VistaClimaPrincipal extends StatelessWidget {
                       return _ConstruirVistaError(
                         mensaje: state.mensajeError ?? 'Ocurrió un error inesperado.',
                         tipo: state.tipoError,
-                        onReintentar: () {
-                          context.read<ClimaBloc>().add(const ReintentarConsultaEvent());
-                        },
+                        onReintentar: state.ultimoEventoConsulta != null
+                            ? () {
+                                context
+                                    .read<ClimaBloc>()
+                                    .add(const ReintentarConsultaEvent());
+                              }
+                            : null,
                       );
                     }
 
@@ -200,12 +204,12 @@ class VistaClimaPrincipal extends StatelessWidget {
 class _ConstruirVistaError extends StatelessWidget {
   final String mensaje;
   final TipoErrorClima? tipo;
-  final VoidCallback onReintentar;
+  final VoidCallback? onReintentar;
 
   const _ConstruirVistaError({
     required this.mensaje,
     required this.tipo,
-    required this.onReintentar,
+    this.onReintentar,
   });
 
   @override
@@ -269,18 +273,20 @@ class _ConstruirVistaError extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: onReintentar,
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Reintentar'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+            if (onReintentar != null) ...[
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: onReintentar,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Reintentar'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

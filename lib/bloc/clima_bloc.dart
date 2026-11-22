@@ -63,6 +63,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
           estado: EstadoClima.error,
           mensajeError: 'Por favor, escribe el nombre de una ciudad.',
           tipoError: TipoErrorClima.ciudadNoEncontrada,
+          limpiarUltimoEvento: true,
         ),
       );
       return;
@@ -73,7 +74,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
         estado: EstadoClima.cargando,
         sugerencias: const [],
         limpiarError: true,
-        ultimaConsulta: texto,
+        ultimoEventoConsulta: event,
       ),
     );
 
@@ -131,7 +132,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
         estado: EstadoClima.cargando,
         sugerencias: const [],
         limpiarError: true,
-        ultimaConsulta: ciudad.nombreCompleto,
+        ultimoEventoConsulta: event,
       ),
     );
 
@@ -184,7 +185,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
         estado: EstadoClima.cargando,
         sugerencias: const [],
         limpiarError: true,
-        ultimaConsulta: nombre,
+        ultimoEventoConsulta: event,
       ),
     );
 
@@ -229,8 +230,9 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     ReintentarConsultaEvent event,
     Emitter<ClimaEstado> emit,
   ) {
-    if (state.ultimaConsulta != null && state.ultimaConsulta!.isNotEmpty) {
-      add(ConsultarClimaPorTextoEvent(state.ultimaConsulta!));
+    final ultimoEvento = state.ultimoEventoConsulta;
+    if (ultimoEvento != null) {
+      add(ultimoEvento);
     }
   }
 }

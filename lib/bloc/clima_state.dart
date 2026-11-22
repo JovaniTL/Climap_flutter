@@ -3,6 +3,7 @@ import '../modelos/ciudad_modelo.dart';
 import '../modelos/clima_modelo.dart';
 import '../modelos/recomendacion_modelo.dart';
 import '../servicios/clima_api_servicio.dart';
+import 'clima_event.dart';
 
 enum EstadoClima {
   inicial,
@@ -19,7 +20,7 @@ class ClimaEstado extends Equatable {
   final String? mensajeError;
   final TipoErrorClima? tipoError;
   final List<RecomendacionModelo> recomendaciones;
-  final String? ultimaConsulta;
+  final ClimaEvent? ultimoEventoConsulta;
 
   const ClimaEstado({
     this.estado = EstadoClima.inicial,
@@ -29,7 +30,7 @@ class ClimaEstado extends Equatable {
     this.mensajeError,
     this.tipoError,
     this.recomendaciones = const [],
-    this.ultimaConsulta,
+    this.ultimoEventoConsulta,
   });
 
   ClimaEstado copyWith({
@@ -41,7 +42,8 @@ class ClimaEstado extends Equatable {
     TipoErrorClima? tipoError,
     bool limpiarError = false,
     List<RecomendacionModelo>? recomendaciones,
-    String? ultimaConsulta,
+    ClimaEvent? ultimoEventoConsulta,
+    bool limpiarUltimoEvento = false,
   }) {
     return ClimaEstado(
       estado: estado ?? this.estado,
@@ -51,7 +53,9 @@ class ClimaEstado extends Equatable {
       mensajeError: limpiarError ? null : (mensajeError ?? this.mensajeError),
       tipoError: limpiarError ? null : (tipoError ?? this.tipoError),
       recomendaciones: recomendaciones ?? this.recomendaciones,
-      ultimaConsulta: ultimaConsulta ?? this.ultimaConsulta,
+      ultimoEventoConsulta: limpiarUltimoEvento
+          ? null
+          : (ultimoEventoConsulta ?? this.ultimoEventoConsulta),
     );
   }
 
@@ -64,7 +68,7 @@ class ClimaEstado extends Equatable {
     mensajeError,
     tipoError,
     recomendaciones,
-    ultimaConsulta,
+    ultimoEventoConsulta,
   ];
 }
 

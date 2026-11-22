@@ -9,6 +9,7 @@ import 'widgets/buscador_ciudades_widget.dart';
 import 'widgets/lista_pronostico_widget.dart';
 import 'widgets/lista_recomendaciones_widget.dart';
 import 'widgets/monito_clima_widget.dart';
+import 'widgets/notificacion_clima_overlay.dart';
 import 'widgets/rejilla_detalles_clima.dart';
 import 'widgets/tarjeta_clima_actual.dart';
 
@@ -31,7 +32,14 @@ class VistaClimaPrincipal extends StatelessWidget {
 
               // 2. Contenido dinámico según el estado de BLoC
               Expanded(
-                child: BlocBuilder<ClimaBloc, ClimaEstado>(
+                child: BlocConsumer<ClimaBloc, ClimaEstado>(
+                  listenWhen: (anterior, actual) =>
+                      actual.estado == EstadoClima.exitoso &&
+                      actual.clima != null &&
+                      actual.clima != anterior.clima,
+                  listener: (context, state) {
+                    NotificacionClimaOverlay.mostrar(context, state.clima!);
+                  },
                   builder: (context, state) {
                     // Estado de Carga
                     if (state.estado == EstadoClima.cargando) {

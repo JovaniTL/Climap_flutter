@@ -2,7 +2,7 @@
 
 # ☀️ CliMap
 
-**Aplicación móvil de pronóstico del clima en Flutter con memes climáticos, notificaciones flotantes, comparador de ciudades y mapa mundial interactivo.**
+**Aplicación móvil de pronóstico del clima en Flutter con memes climáticos dinámicos, comparador de ciudades y mapa mundial interactivo.**
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.47%2B-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-%5E3.13.2-0175C2?logo=dart&logoColor=white)
@@ -39,18 +39,18 @@
 
 ## 🚀 Diferenciador innovador
 
-Además de cubrir todas las métricas meteorológicas estándar, **CliMap** integra tres experiencias propias pensadas para aportar valor y dinamismo:
+Además de cubrir todas las métricas meteorológicas estándar, **CliMap** integra tres experiencias propias que aportan valor y dinamismo:
 
-### 1. Notificaciones flotantes animadas y Memes Climáticos (*Monito Climático*)
-Al consultar cualquier ciudad, se despliega una **notificación flotante animada** desde la parte superior con un meme representativo del clima actual y la recomendación del momento. Al tocar la notificación o la tarjeta del meme, se abre una vista ampliada con todos los detalles.
+### 1. Memes Climáticos Dinámicos (*Monito Climático*)
+Tarjeta visual temática (`MonitoClimaWidget`) que adapta su imagen, paleta de color y consejo según la temperatura, lluvia o viento de la ciudad consultada:
 
 | Estado climático | Condición de activación | Acción del meme | Vista |
 | :--- | :--- | :--- | :---: |
-| **Día Lluvioso / Tormenta 🌧️** | Prob. lluvia ≥ 40% o código WMO de lluvia/tormenta | Monito con paraguas e impermeable | <img src="assets/imagenes/lluvioso.png" width="56" alt="Meme lluvioso"> |
-| **Día Caluroso ☀️** | Temperatura ≥ 26 °C | Monito poniéndose protector solar FPS 50+ | <img src="assets/imagenes/caluroso.png" width="56" alt="Meme caluroso"> |
-| **Día Frío ❄️** | Temperatura < 15 °C | Monito bien abrigado con chocolate caliente | <img src="assets/imagenes/frio.png" width="56" alt="Meme frío"> |
-| **Día Ventoso 💨** | Velocidad del viento ≥ 22 km/h | Monito sujetando su sombrero ante ráfagas | <img src="assets/imagenes/viento.png" width="56" alt="Meme viento"> |
-| **Clima Agradable 🌤️** | Condiciones templadas estables | Monito paseando relajado al aire libre | <img src="assets/imagenes/templado.png" width="56" alt="Meme templado"> |
+| **Día Lluvioso 🌧️** | Prob. lluvia ≥ 40% o código WMO de lluvia/tormenta | Monito con paraguas e impermeable | <img src="assets/imagenes/lluvioso.png" width="56" alt="Meme lluvioso"> |
+| **Día Caluroso ☀️** | Temperatura ≥ 26 °C | Monito poniéndose protector solar | <img src="assets/imagenes/caluroso.png" width="56" alt="Meme caluroso"> |
+| **Día Frío ❄️** | Temperatura < 15 °C | Monito bien abrigado | <img src="assets/imagenes/frio.png" width="56" alt="Meme frío"> |
+| **Día Ventoso 💨** | Velocidad del viento ≥ 22 km/h | Monito sujetando su sombrero | <img src="assets/imagenes/viento.png" width="56" alt="Meme viento"> |
+| **Clima Agradable 🌤️** | Condiciones templadas estables | Monito paseando relajado | <img src="assets/imagenes/templado.png" width="56" alt="Meme templado"> |
 
 ### 2. Comparador de Ciudades + Índice de Aptitud al Aire Libre
 Compara dos ciudades al mismo tiempo, evalúa lluvia, temperatura ideal y viento para calcular un **puntaje de aptitud de 0 a 100%**, emite un **veredicto automático** y muestra una tabla comparativa con los 6 indicadores clave.
@@ -68,39 +68,39 @@ Mapa interactivo basado en **OpenStreetMap** (`flutter_map`) donde puedes despla
 
 <div align="center">
 
-| Inicio y búsqueda rápida | Clima actual y meme | Detalles, consejos y 7 días |
+| Inicio y búsqueda rápida | Clima actual y meme lluvioso | Detalles, consejos y 7 días |
 | :---: | :---: | :---: |
 | <img src="docs/capturas/01_inicio.png" width="240" alt="Pantalla de inicio"> | <img src="docs/capturas/02_clima_actual.png" width="240" alt="Clima actual y meme"> | <img src="docs/capturas/03_clima_detalles.png" width="240" alt="Detalles atmosféricos y pronóstico"> |
 
 </div>
 
-### Notificaciones flotantes y vista ampliada de memes
+### Memes dinámicos según el clima de cada ciudad
 
 <div align="center">
 
-| Notificación de clima frío | Notificación de clima caluroso | Meme ampliado al tocar |
-| :---: | :---: | :---: |
-| <img src="docs/capturas/05_notificacion_frio.png" width="240" alt="Notificación flotante clima frío"> | <img src="docs/capturas/06_notificacion_calor.png" width="240" alt="Notificación flotante clima caluroso"> | <img src="docs/capturas/04_meme_ampliado.png" width="240" alt="Meme ampliado"> |
-
-</div>
-
-### Comparador de ciudades y mapa mundial interactivo
-
-<div align="center">
-
-| Comparador y veredicto | Tabla comparativa | Mapa mundial (OpenStreetMap) |
-| :---: | :---: | :---: |
-| <img src="docs/capturas/07_comparador.png" width="240" alt="Comparador de ciudades"> | <img src="docs/capturas/08_comparador_tabla.png" width="240" alt="Tabla comparativa"> | <img src="docs/capturas/09_mapa_interactivo.png" width="240" alt="Mapa interactivo"> |
-
-</div>
-
-### Consulta por coordenadas y manejo de errores
-
-<div align="center">
-
-| Consulta de coordenadas en mapa | Validación cuando la ciudad no existe |
+| Clima frío (Oslo, 0 °C) | Clima caluroso (Bangkok, 31 °C) |
 | :---: | :---: |
-| <img src="docs/capturas/10_mapa_consulta.png" width="250" alt="Consulta desde el mapa"> | <img src="docs/capturas/11_error_ciudad.png" width="250" alt="Error ciudad no encontrada"> |
+| <img src="docs/capturas/04_clima_frio.png" width="250" alt="Clima frío con meme"> | <img src="docs/capturas/05_clima_calor.png" width="250" alt="Clima caluroso con meme"> |
+
+</div>
+
+### Comparador de ciudades
+
+<div align="center">
+
+| Veredicto y puntaje de aptitud | Tabla comparativa de indicadores |
+| :---: | :---: |
+| <img src="docs/capturas/06_comparador.png" width="250" alt="Comparador de ciudades"> | <img src="docs/capturas/07_comparador_tabla.png" width="250" alt="Tabla comparativa"> |
+
+</div>
+
+### Mapa mundial interactivo y manejo de errores
+
+<div align="center">
+
+| Mapa mundial (OpenStreetMap) | Consulta de coordenadas en mapa | Validación ciudad no encontrada |
+| :---: | :---: | :---: |
+| <img src="docs/capturas/08_mapa_interactivo.png" width="240" alt="Mapa interactivo"> | <img src="docs/capturas/09_mapa_consulta.png" width="240" alt="Consulta desde el mapa"> | <img src="docs/capturas/10_error_ciudad.png" width="240" alt="Error ciudad no encontrada"> |
 
 </div>
 
@@ -114,7 +114,7 @@ flowchart LR
     BLOC -->|"Consultas HTTP"| API["ClimaApiServicio"]
     API -->|"Geocoding y Forecast"| OM["Open-Meteo API"]
     BLOC -->|"Reglas y Puntaje"| UTIL["RecomendadorClima y EvaluadorActividades"]
-    BLOC -->|"Estado + Alertas"| UI
+    BLOC -->|"Estado"| UI
     MAP["VistaMapa (flutter_map)"] -->|"Tiles"| OSM["OpenStreetMap"]
 ```
 
@@ -158,8 +158,7 @@ lib/
         ├── buscador_ciudades_widget.dart    # Campo de búsqueda con debounce y sugerencias
         ├── lista_pronostico_widget.dart     # Carrusel horizontal de 7 días
         ├── lista_recomendaciones_widget.dart
-        ├── monito_clima_widget.dart         # Tarjeta de meme climático y modal ampliado
-        ├── notificacion_clima_overlay.dart  # Notificación flotante animada con meme
+        ├── monito_clima_widget.dart         # Tarjeta visual temática con memes climáticos
         ├── rejilla_detalles_clima.dart      # Humedad, lluvia, viento y presión
         └── tarjeta_clima_actual.dart        # Tarjeta principal con gradiente dinámico
 ```

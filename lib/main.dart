@@ -28,7 +28,7 @@ class MiAplicacionClima extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'App Clima',
+        title: 'CliMap',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,

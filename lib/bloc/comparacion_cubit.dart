@@ -44,10 +44,20 @@ class ComparacionEstado extends Equatable {
 /// Cubit para gestionar la comparación simultánea de dos ciudades.
 class ComparacionCubit extends Cubit<ComparacionEstado> {
   final ClimaApiServicio _servicio;
+  final bool _esServicioPropio;
 
   ComparacionCubit({ClimaApiServicio? servicio})
       : _servicio = servicio ?? ClimaApiServicio(),
+        _esServicioPropio = servicio == null,
         super(const ComparacionEstado());
+
+  @override
+  Future<void> close() {
+    if (_esServicioPropio) {
+      _servicio.cerrar();
+    }
+    return super.close();
+  }
 
   /// Realiza la consulta de ambas ciudades y calcula el veredicto comparativo
   Future<void> compararCiudades({

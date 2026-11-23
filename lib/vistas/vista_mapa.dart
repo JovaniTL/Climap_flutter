@@ -23,17 +23,20 @@ class VistaMapa extends StatefulWidget {
 
 class _VistaMapaState extends State<VistaMapa> {
   late final MapController _mapController;
+  late final ClimaApiServicio _servicio;
   bool _consultando = false;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
+    _servicio = ClimaApiServicio();
   }
 
   @override
   void dispose() {
     _mapController.dispose();
+    _servicio.cerrar();
     super.dispose();
   }
 
@@ -46,8 +49,7 @@ class _VistaMapaState extends State<VistaMapa> {
     setState(() => _consultando = true);
 
     try {
-      final servicio = ClimaApiServicio();
-      final clima = await servicio.obtenerClima(
+      final clima = await _servicio.obtenerClima(
         latitud: lat,
         longitud: lon,
         nombreLugar: 'Ubicación seleccionada (${lat.toStringAsFixed(2)}, ${lon.toStringAsFixed(2)})',
@@ -76,8 +78,14 @@ class _VistaMapaState extends State<VistaMapa> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        final icono = ClimaTraductor.obtenerIcono(clima.codigoClima);
-        final descripcion = ClimaTraductor.obtenerDescripcion(clima.codigoClima);
+        final icono = ClimaTraductor.obtenerIcono(
+          clima.codigoClima,
+          esDeDia: clima.esDeDia,
+        );
+        final descripcion = ClimaTraductor.obtenerDescripcion(
+          clima.codigoClima,
+          esDeDia: clima.esDeDia,
+        );
 
         return Container(
           padding: const EdgeInsets.all(20),
@@ -86,7 +94,7 @@ class _VistaMapaState extends State<VistaMapa> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 16,
               ),
             ],
@@ -122,7 +130,10 @@ class _VistaMapaState extends State<VistaMapa> {
                         ),
                         Text(
                           '$descripcion • ${clima.temperatura.round()}°C (Sensación ${clima.sensacionTermica.toStringAsFixed(1)}°C)',
-                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -185,7 +196,7 @@ class _VistaMapaState extends State<VistaMapa> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.app_clima',
+                userAgentPackageName: 'com.example.climap_flutter',
               ),
             ],
           ),
@@ -222,11 +233,11 @@ class _VistaMapaState extends State<VistaMapa> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor.withOpacity(0.92),
+                color: Theme.of(context).cardColor.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

@@ -93,7 +93,7 @@ class _ItemDetalle extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -104,7 +104,7 @@ class _ItemDetalle extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: colorIcono.withOpacity(0.12),
+              color: colorIcono.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icono, color: colorIcono, size: 24),
@@ -118,7 +118,7 @@ class _ItemDetalle extends StatelessWidget {
                   etiqueta,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 4),

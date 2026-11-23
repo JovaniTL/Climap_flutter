@@ -48,7 +48,7 @@ class ListaRecomendacionesWidget extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -60,7 +60,7 @@ class ListaRecomendacionesWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: rec.color.withOpacity(0.14),
+                      color: rec.color.withValues(alpha: 0.14),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(rec.icono, color: rec.color, size: 22),
@@ -82,7 +82,7 @@ class ListaRecomendacionesWidget extends StatelessWidget {
                           rec.descripcion,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade700,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             height: 1.3,
                           ),
                         ),

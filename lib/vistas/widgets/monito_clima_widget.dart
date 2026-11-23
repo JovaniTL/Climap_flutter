@@ -22,7 +22,7 @@ class DatosMemeClima {
   });
 }
 
-/// Widget que muestra el meme / ilustración temática del "Monito Climático"
+/// Widget que muestra la ilustración temática del "Monito Climático"
 /// adaptándose a la temperatura y las condiciones meteorológicas actuales.
 class MonitoClimaWidget extends StatelessWidget {
   final ClimaModelo clima;
@@ -102,267 +102,145 @@ class MonitoClimaWidget extends StatelessWidget {
     );
   }
 
-  /// Abre un diálogo mostrando el meme climático en tamaño completo.
-  static void mostrarMemeEnGrande(BuildContext context, ClimaModelo clima) {
-    final datos = obtenerDatos(clima);
-    final ciudad = clima.nombreLugar.split(',').first;
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        final colorScheme = Theme.of(ctx).colorScheme;
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: datos.colorFondo.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        datos.etiquetaEstado,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: datos.colorFondo,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '$ciudad • ${clima.temperatura.round()}°C',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Image.asset(
-                      datos.rutaImagenAsset,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                datos.colorFondo.withValues(alpha: 0.8),
-                                datos.colorFondo,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              datos.iconoPrincipal,
-                              size: 84,
-                              color: Colors.white,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  datos.tituloAccion,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  datos.descripcion,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 14),
-                FilledButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Cerrar'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final datosMonito = obtenerDatos(clima);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Material(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
         color: datosMonito.colorFondo.withValues(alpha: 0.12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide(
-            color: datosMonito.colorFondo.withValues(alpha: 0.35),
-            width: 1.5,
-          ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: datosMonito.colorFondo.withValues(alpha: 0.35),
+          width: 1.5,
         ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => mostrarMemeEnGrande(context, clima),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+      ),
+      child: Row(
+        children: [
+          // Marco redondeado con recorte limpio para el meme del clima
+          Container(
+            width: 92,
+            height: 92,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: datosMonito.colorFondo.withValues(alpha: 0.45),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: datosMonito.colorFondo.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Stack(
+              fit: StackFit.expand,
               children: [
-                // Marco redondeado con recorte limpio para el meme del clima
-                Container(
-                  width: 92,
-                  height: 92,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: datosMonito.colorFondo.withValues(alpha: 0.45),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: datosMonito.colorFondo.withValues(alpha: 0.25),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.asset(
-                          datosMonito.rutaImagenAsset,
-                          width: 92,
-                          height: 92,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    datosMonito.colorFondo.withValues(alpha: 0.8),
-                                    datosMonito.colorFondo,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: Icon(
-                                datosMonito.iconoPrincipal,
-                                size: 46,
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 4,
-                        right: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 4,
-                              ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    datosMonito.rutaImagenAsset,
+                    width: 92,
+                    height: 92,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              datosMonito.colorFondo.withValues(alpha: 0.8),
+                              datosMonito.colorFondo,
                             ],
-                          ),
-                          child: Icon(
-                            datosMonito.iconoAccesorio,
-                            size: 16,
-                            color: datosMonito.colorFondo,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-                      ),
-                    ],
+                        child: Icon(
+                          datosMonito.iconoPrincipal,
+                          size: 46,
+                          color: Colors.white,
+                        ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(width: 16),
-                // Descripción y mensaje del Monito
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                Positioned(
+                  bottom: 4,
+                  right: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 4,
                         ),
-                        decoration: BoxDecoration(
-                          color: datosMonito.colorFondo.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          datosMonito.etiquetaEstado,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: datosMonito.colorFondo,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        datosMonito.tituloAccion,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        datosMonito.descripcion,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Icon(
+                      datosMonito.iconoAccesorio,
+                      size: 16,
+                      color: datosMonito.colorFondo,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+          const SizedBox(width: 16),
+          // Descripción y mensaje del Monito
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: datosMonito.colorFondo.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    datosMonito.etiquetaEstado,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: datosMonito.colorFondo,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  datosMonito.tituloAccion,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  datosMonito.descripcion,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

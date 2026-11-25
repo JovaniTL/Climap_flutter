@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../modelos/clima_modelo.dart';
 
-/// Widget que muestra la ilustración temática del "Monito Climático"
-/// adaptándose a la temperatura y las condiciones meteorológicas actuales.
 class MonitoClimaWidget extends StatelessWidget {
   final ClimaModelo clima;
 
@@ -10,118 +9,79 @@ class MonitoClimaWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determinar la categoría y detalles visuales del monito
     final datosMonito = _obtenerDatosMonito(clima);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: datosMonito.colorFondo.withOpacity(0.12),
+        color: datosMonito.colorFondo.withAlpha(31),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: datosMonito.colorFondo.withOpacity(0.3),
+          color: datosMonito.colorFondo.withAlpha(77),
           width: 1.5,
         ),
       ),
       child: Row(
         children: [
-          // Ilustración o Avatar gráfico del Monito
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  datosMonito.colorFondo.withOpacity(0.8),
-                  datosMonito.colorFondo,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: datosMonito.colorFondo.withOpacity(0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Intenta cargar la imagen si el usuario la agregó a assets, o muestra la ilustración de iconos
-                Image.asset(
-                  datosMonito.rutaImagenAsset,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Fallback visualmente atractivo con iconos temáticos
-                    return Icon(
-                      datosMonito.iconoPrincipal,
-                      size: 46,
-                      color: Colors.white,
-                    );
-                  },
-                ),
-                // Pequeño badge con accesorio en la esquina
-                Positioned(
-                  bottom: 4,
-                  right: 4,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      datosMonito.iconoAccesorio,
-                      size: 16,
-                      color: datosMonito.colorFondo,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _ilustracion(datosMonito),
           const SizedBox(width: 16),
-          // Descripción y mensaje del Monito
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: datosMonito.colorFondo.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    datosMonito.etiquetaEstado,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: datosMonito.colorFondo,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  datosMonito.tituloAccion,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  datosMonito.descripcion,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
-                  ),
-                ),
-              ],
+          Expanded(child: _mensaje(context, datosMonito)),
+        ],
+      ),
+    );
+  }
+
+  Widget _ilustracion(_DatosMonito datosMonito) {
+    return Container(
+      width: 90,
+      height: 90,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            datosMonito.colorFondo.withAlpha(204),
+            datosMonito.colorFondo,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: datosMonito.colorFondo.withAlpha(89),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.asset(
+            datosMonito.rutaImagenAsset,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                datosMonito.iconoPrincipal,
+                size: 46,
+                color: Colors.white,
+              );
+            },
+          ),
+          Positioned(
+            bottom: 4,
+            right: 4,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                datosMonito.iconoAccesorio,
+                size: 16,
+                color: datosMonito.colorFondo,
+              ),
             ),
           ),
         ],
@@ -129,10 +89,46 @@ class MonitoClimaWidget extends StatelessWidget {
     );
   }
 
-  /// Evalúa las condiciones para elegir la ilustración adecuada
+  Widget _mensaje(BuildContext context, _DatosMonito datosMonito) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: datosMonito.colorFondo.withAlpha(51),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            datosMonito.etiquetaEstado,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: datosMonito.colorFondo,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          datosMonito.tituloAccion,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          datosMonito.descripcion,
+          style: TextStyle(
+            fontSize: 13,
+            color: Theme.of(context).textTheme.bodyMedium?.color
+                ?.withAlpha(204),
+          ),
+        ),
+      ],
+    );
+  }
+
   _DatosMonito _obtenerDatosMonito(ClimaModelo clima) {
-    // 1. Tormenta o Lluvia
-    if (clima.probabilidadLluvia >= 40 || (clima.codigoClima >= 51 && clima.codigoClima <= 82)) {
+    if (clima.probabilidadLluvia >= 40 ||
+        (clima.codigoClima >= 51 && clima.codigoClima <= 82)) {
       return const _DatosMonito(
         etiquetaEstado: 'Día Lluvioso 🌧️',
         tituloAccion: 'Monito con paraguas e impermeable',
@@ -144,20 +140,18 @@ class MonitoClimaWidget extends StatelessWidget {
       );
     }
 
-    // 2. Clima Caluroso
     if (clima.temperatura >= 26.0) {
       return const _DatosMonito(
         etiquetaEstado: 'Día Caluroso ☀️',
         tituloAccion: 'Monito poniéndose protector solar',
         descripcion: 'Aplicándose crema solar FPS 50+, usando gafas oscuras y bebiendo agua fresca.',
         iconoPrincipal: Icons.wb_sunny_rounded,
-        iconoAccesorio: Icons.sanitizer_rounded, // Representa el bote de protector
+        iconoAccesorio: Icons.sanitizer_rounded,
         colorFondo: Colors.orange,
         rutaImagenAsset: 'assets/imagenes/caluroso.png',
       );
     }
 
-    // 3. Clima Frío
     if (clima.temperatura < 15.0) {
       return const _DatosMonito(
         etiquetaEstado: 'Día Frío ❄️',
@@ -170,7 +164,6 @@ class MonitoClimaWidget extends StatelessWidget {
       );
     }
 
-    // 4. Viento Fuerte
     if (clima.velocidadViento >= 22.0) {
       return const _DatosMonito(
         etiquetaEstado: 'Día Ventoso 💨',
@@ -183,11 +176,11 @@ class MonitoClimaWidget extends StatelessWidget {
       );
     }
 
-    // 5. Clima Templado Agradable
     return const _DatosMonito(
       etiquetaEstado: 'Clima Agradable 🌤️',
       tituloAccion: 'Monito paseando relajado',
-      descripcion: 'Disfrutando de una temperatura perfecta para caminar al aire libre.',
+      descripcion:
+          'Disfrutando de una temperatura perfecta para caminar al aire libre.',
       iconoPrincipal: Icons.directions_walk_rounded,
       iconoAccesorio: Icons.favorite_rounded,
       colorFondo: Colors.green,
@@ -215,4 +208,3 @@ class _DatosMonito {
     required this.rutaImagenAsset,
   });
 }
-

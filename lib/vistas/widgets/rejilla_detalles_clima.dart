@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../modelos/clima_modelo.dart';
 
-/// Rejilla de tarjetas que muestra los detalles climáticos obligatorios:
-/// Sensación térmica, Humedad, Presión atmosférica, Viento y Probabilidad de lluvia.
 class RejillaDetallesClima extends StatelessWidget {
   final ClimaModelo clima;
 
@@ -15,13 +14,9 @@ class RejillaDetallesClima extends StatelessWidget {
       children: [
         const Text(
           'Detalles Atmosféricos',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
-        // Fila 1: Humedad y Probabilidad de Lluvia
         Row(
           children: [
             Expanded(
@@ -44,7 +39,6 @@ class RejillaDetallesClima extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        // Fila 2: Velocidad del Viento y Presión Atmosférica
         Row(
           children: [
             Expanded(
@@ -93,7 +87,7 @@ class _ItemDetalle extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -104,7 +98,7 @@ class _ItemDetalle extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: colorIcono.withOpacity(0.12),
+              color: colorIcono.withAlpha(31),
               shape: BoxShape.circle,
             ),
             child: Icon(icono, color: colorIcono, size: 24),
@@ -116,10 +110,7 @@ class _ItemDetalle extends StatelessWidget {
               children: [
                 Text(
                   etiqueta,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -137,4 +128,3 @@ class _ItemDetalle extends StatelessWidget {
     );
   }
 }
-

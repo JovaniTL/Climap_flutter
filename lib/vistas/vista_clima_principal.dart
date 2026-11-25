@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/clima_bloc.dart';
 import '../bloc/clima_event.dart';
 import '../bloc/clima_state.dart';
+import '../modelos/clima_modelo.dart';
+import '../modelos/recomendacion_modelo.dart';
 import '../servicios/clima_api_servicio.dart';
 import 'widgets/buscador_ciudades_widget.dart';
 import 'widgets/lista_pronostico_widget.dart';
@@ -12,182 +14,20 @@ import 'widgets/monito_clima_widget.dart';
 import 'widgets/rejilla_detalles_clima.dart';
 import 'widgets/tarjeta_clima_actual.dart';
 
-/// Vista principal que contiene la búsqueda, gestión de errores, monito climático,
-/// detalles atmosféricos, recomendaciones y pronóstico semanal.
 class VistaClimaPrincipal extends StatelessWidget {
   const VistaClimaPrincipal({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
             children: [
-              // 1. Buscador siempre visible en la parte superior
-              const BuscadorCiudadesWidget(),
-              const SizedBox(height: 12),
-
-              // 2. Contenido dinámico según el estado de BLoC
-              Expanded(
-                child: BlocBuilder<ClimaBloc, ClimaEstado>(
-                  builder: (context, state) {
-                    // Estado de Carga
-                    if (state.estado == EstadoClima.cargando) {
-                      return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text(
-                              'Consultando servicio meteorológico...',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    // Estado de Error (Sin internet, ciudad no encontrada, falla de API)
-                    if (state.estado == EstadoClima.error) {
-                      return _ConstruirVistaError(
-                        mensaje: state.mensajeError ?? 'Ocurrió un error inesperado.',
-                        tipo: state.tipoError,
-                        onReintentar: () {
-                          context.read<ClimaBloc>().add(const ReintentarConsultaEvent());
-                        },
-                      );
-                    }
-
-                    // Estado Inicial (Pantalla de bienvenida)
-                    if (state.estado == EstadoClima.inicial || state.clima == null) {
-                      return Center(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.cloud_sync_rounded,
-                                  size: 72,
-                                  color: Colors.blueAccent,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              const Text(
-                                '¡Consulta el clima de cualquier ciudad!',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 32),
-                                child: Text(
-                                  'Escribe el nombre de tu ciudad arriba (ej. Zitácuaro, Morelia, CDMX) y pulsa "Buscar" para obtener el clima, recomendaciones y el monito interactivo.',
-                                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              // Botones rápidos de ejemplo
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                alignment: WrapAlignment.center,
-                                children: [
-                                  _ChipCiudadRapida(nombre: 'Zitácuaro'),
-                                  _ChipCiudadRapida(nombre: 'Morelia'),
-                                  _ChipCiudadRapida(nombre: 'Ciudad de México'),
-                                  _ChipCiudadRapida(nombre: 'Guadalajara'),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    // Estado Exitoso: Se adapta a celular o tablet
-                    final clima = state.clima!;
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        final esPantallaAncha = constraints.maxWidth >= 600;
-
-                        if (esPantallaAncha) {
-                          // Diseño para Tablets / Pantallas anchas (2 columnas)
-                          return SingleChildScrollView(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Columna Izquierda: Tarjeta de Clima + Monito
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    children: [
-                                      TarjetaClimaActual(clima: clima),
-                                      MonitoClimaWidget(clima: clima),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                // Columna Derecha: Detalles, Recomendaciones y Pronóstico
-                                Expanded(
-                                  flex: 6,
-                                  child: Column(
-                                    children: [
-                                      RejillaDetallesClima(clima: clima),
-                                      const SizedBox(height: 16),
-                                      ListaRecomendacionesWidget(
-                                        recomendaciones: state.recomendaciones,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      ListaPronosticoWidget(
-                                        pronostico: clima.pronosticoSemanal,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        // Diseño para Celulares (Columna única desplazable)
-                        return SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            children: [
-                              TarjetaClimaActual(clima: clima),
-                              MonitoClimaWidget(clima: clima),
-                              const SizedBox(height: 16),
-                              RejillaDetallesClima(clima: clima),
-                              const SizedBox(height: 20),
-                              ListaRecomendacionesWidget(
-                                recomendaciones: state.recomendaciones,
-                              ),
-                              const SizedBox(height: 20),
-                              ListaPronosticoWidget(
-                                pronostico: clima.pronosticoSemanal,
-                              ),
-                              const SizedBox(height: 24),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+              BuscadorCiudadesWidget(),
+              SizedBox(height: 12),
+              Expanded(child: _ContenidoClima()),
             ],
           ),
         ),
@@ -196,13 +36,190 @@ class VistaClimaPrincipal extends StatelessWidget {
   }
 }
 
-/// Widget para mostrar errores descriptivos con opción de reintentar
-class _ConstruirVistaError extends StatelessWidget {
+class _ContenidoClima extends StatelessWidget {
+  const _ContenidoClima();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ClimaBloc, ClimaEstado>(
+      builder: (context, state) {
+        if (state.estado == EstadoClima.cargando) {
+          return const _CargandoClima();
+        }
+
+        if (state.estado == EstadoClima.error) {
+          return _VistaError(
+            mensaje: state.mensajeError ?? 'Ocurrió un error inesperado.',
+            tipo: state.tipoError,
+            onReintentar: () {
+              context.read<ClimaBloc>().add(const ReintentarConsultaEvent());
+            },
+          );
+        }
+
+        final clima = state.clima;
+        if (state.estado == EstadoClima.inicial || clima == null) {
+          return const _InicioClima();
+        }
+
+        return _ClimaConsultado(
+          clima: clima,
+          recomendaciones: state.recomendaciones,
+        );
+      },
+    );
+  }
+}
+
+class _CargandoClima extends StatelessWidget {
+  const _CargandoClima();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text(
+            'Consultando servicio meteorológico...',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InicioClima extends StatelessWidget {
+  const _InicioClima();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.blue.withAlpha(26),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.cloud_sync_rounded,
+                size: 72,
+                color: Colors.blueAccent,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              '¡Consulta el clima de cualquier ciudad!',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                'Escribe el nombre de tu ciudad arriba (ej. Zitácuaro, Morelia, CDMX) y pulsa "Buscar" para obtener el clima, recomendaciones y el monito interactivo.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                _ChipCiudadRapida(nombre: 'Zitácuaro'),
+                _ChipCiudadRapida(nombre: 'Morelia'),
+                _ChipCiudadRapida(nombre: 'Ciudad de México'),
+                _ChipCiudadRapida(nombre: 'Guadalajara'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ClimaConsultado extends StatelessWidget {
+  final ClimaModelo clima;
+  final List<RecomendacionModelo> recomendaciones;
+
+  const _ClimaConsultado({required this.clima, required this.recomendaciones});
+
+  @override
+  Widget build(BuildContext context) {
+    final resumen = [
+      TarjetaClimaActual(clima: clima),
+      MonitoClimaWidget(clima: clima),
+    ];
+    final detalles = RejillaDetallesClima(clima: clima);
+    final sugerencias = ListaRecomendacionesWidget(
+      recomendaciones: recomendaciones,
+    );
+    final pronostico = ListaPronosticoWidget(
+      pronostico: clima.pronosticoSemanal,
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 600) {
+          return SingleChildScrollView(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 5, child: Column(children: resumen)),
+                const SizedBox(width: 20),
+                Expanded(
+                  flex: 6,
+                  child: Column(
+                    children: [
+                      detalles,
+                      const SizedBox(height: 16),
+                      sugerencias,
+                      const SizedBox(height: 16),
+                      pronostico,
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              ...resumen,
+              const SizedBox(height: 16),
+              detalles,
+              const SizedBox(height: 20),
+              sugerencias,
+              const SizedBox(height: 20),
+              pronostico,
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _VistaError extends StatelessWidget {
   final String mensaje;
   final TipoErrorClima? tipo;
   final VoidCallback onReintentar;
 
-  const _ConstruirVistaError({
+  const _VistaError({
     required this.mensaje,
     required this.tipo,
     required this.onReintentar,
@@ -240,7 +257,7 @@ class _ConstruirVistaError extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withAlpha(15),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -252,7 +269,7 @@ class _ConstruirVistaError extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withAlpha(31),
                 shape: BoxShape.circle,
               ),
               child: Icon(icono, size: 54, color: color),
@@ -275,7 +292,10 @@ class _ConstruirVistaError extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Reintentar'),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -304,4 +324,3 @@ class _ChipCiudadRapida extends StatelessWidget {
     );
   }
 }
-

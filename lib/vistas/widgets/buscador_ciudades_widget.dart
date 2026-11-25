@@ -31,10 +31,8 @@ class _BuscadorCiudadesWidgetState extends State<BuscadorCiudadesWidget> {
   void _enviarBusqueda() {
     _debounce?.cancel();
     final texto = _controladorTexto.text.trim();
-    if (texto.isNotEmpty) {
-      _focusNode.unfocus();
-      context.read<ClimaBloc>().add(ConsultarClimaPorTextoEvent(texto));
-    }
+    _focusNode.unfocus();
+    context.read<ClimaBloc>().add(ConsultarClimaPorTextoEvent(texto));
   }
 
   void _limpiarBusqueda() {

@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Representa el pronóstico del clima para un día específico.
 class PronosticoDiaModelo extends Equatable {
   final DateTime fecha;
   final double tempMaxima;
@@ -16,7 +15,6 @@ class PronosticoDiaModelo extends Equatable {
     required this.codigoClima,
   });
 
-  /// Obtiene el nombre del día en español (ej. "Lunes", "Martes").
   String get nombreDia {
     final hoy = DateTime.now();
     final fechaSoloDia = DateTime(fecha.year, fecha.month, fecha.day);
@@ -35,8 +33,7 @@ class PronosticoDiaModelo extends Equatable {
       'Sábado',
       'Domingo',
     ];
-    // weekday va de 1 (lunes) a 7 (domingo)
-    return diasSemana[(fecha.weekday - 1) % 7];
+    return diasSemana[fecha.weekday - 1];
   }
 
   @override
@@ -48,4 +45,3 @@ class PronosticoDiaModelo extends Equatable {
     codigoClima,
   ];
 }
-

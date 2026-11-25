@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/clima_bloc.dart';
 import 'bloc/comparacion_cubit.dart';
+import 'config/tema/app_tema.dart';
+import 'servicios/clima_api_servicio.dart';
 import 'vistas/pantalla_principal.dart';
 
 void main() {
@@ -10,64 +12,38 @@ void main() {
   runApp(const MiAplicacionClima());
 }
 
-/// Punto de entrada de la aplicación.
-/// Inyecta los BLoCs globales (ClimaBloc y ComparacionCubit) para que estén
-/// disponibles en cualquier pantalla.
-class MiAplicacionClima extends StatelessWidget {
+class MiAplicacionClima extends StatefulWidget {
   const MiAplicacionClima({super.key});
+
+  @override
+  State<MiAplicacionClima> createState() => _MiAplicacionClimaState();
+}
+
+class _MiAplicacionClimaState extends State<MiAplicacionClima> {
+  final _servicio = ClimaApiServicio();
+
+  @override
+  void dispose() {
+    _servicio.cerrar();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ClimaBloc>(
-          create: (_) => ClimaBloc(),
-        ),
+        BlocProvider<ClimaBloc>(create: (_) => ClimaBloc(servicio: _servicio)),
         BlocProvider<ComparacionCubit>(
-          create: (_) => ComparacionCubit(),
+          create: (_) => ComparacionCubit(servicio: _servicio),
         ),
       ],
       child: MaterialApp(
         title: 'CliMap',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blueAccent,
-            brightness: Brightness.light,
-          ),
-          cardTheme: CardThemeData(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-            scrolledUnderElevation: 1,
-          ),
-        ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blueAccent,
-            brightness: Brightness.dark,
-          ),
-          cardTheme: CardThemeData(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-            scrolledUnderElevation: 1,
-          ),
-        ),
+        theme: const AppTema(brillo: Brightness.light).getTema(),
+        darkTheme: const AppTema(brillo: Brightness.dark).getTema(),
         themeMode: ThemeMode.system,
-        home: const PantallaPrincipal(),
+        home: PantallaPrincipal(servicio: _servicio),
       ),
     );
   }

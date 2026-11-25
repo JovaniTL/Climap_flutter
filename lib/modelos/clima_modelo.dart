@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
+
 import 'pronostico_modelo.dart';
 
-/// Modelo principal con todos los datos meteorológicos requeridos.
 class ClimaModelo extends Equatable {
   final String nombreLugar;
   final double temperatura;
   final double sensacionTermica;
   final int humedad;
-  final double presionAtmosferica; // En hPa (hectopascales)
-  final double velocidadViento; // En km/h
-  final int probabilidadLluvia; // En porcentaje %
-  final int codigoClima; // Código WMO
+  final double presionAtmosferica;
+  final double velocidadViento;
+  final int probabilidadLluvia;
+  final int codigoClima;
   final bool esDeDia;
   final double latitud;
   final double longitud;
@@ -33,64 +33,67 @@ class ClimaModelo extends Equatable {
     required this.fechaConsulta,
   });
 
-  /// Crea la instancia a partir de la respuesta JSON de Open-Meteo API.
   factory ClimaModelo.fromOpenMeteoJson(
     Map<String, dynamic> json, {
     required String nombreLugar,
     required double latitud,
     required double longitud,
   }) {
-    final current = json['current'] as Map<String, dynamic>? ?? {};
-    final daily = json['daily'] as Map<String, dynamic>? ?? {};
-
-    // Procesar pronóstico diario
-    final tiempos = (daily['time'] as List?)?.cast<String>() ?? [];
-    final maxTemps = daily['temperature_2m_max'] as List? ?? [];
-    final minTemps = daily['temperature_2m_min'] as List? ?? [];
-    final probasLluvia = daily['precipitation_probability_max'] as List? ?? [];
-    final codigos = daily['weather_code'] as List? ?? [];
-
-    final List<PronosticoDiaModelo> listaPronostico = [];
-    for (int i = 0; i < tiempos.length; i++) {
-      final fechaParsed = DateTime.tryParse(tiempos[i]) ?? DateTime.now();
-      final maxT = i < maxTemps.length ? (maxTemps[i] as num?)?.toDouble() ?? 0.0 : 0.0;
-      final minT = i < minTemps.length ? (minTemps[i] as num?)?.toDouble() ?? 0.0 : 0.0;
-      final probL = i < probasLluvia.length ? (probasLluvia[i] as num?)?.toInt() ?? 0 : 0;
-      final cod = i < codigos.length ? (codigos[i] as num?)?.toInt() ?? 0 : 0;
-
-      listaPronostico.add(
-        PronosticoDiaModelo(
-          fecha: fechaParsed,
-          tempMaxima: maxT,
-          tempMinima: minT,
-          probabilidadLluvia: probL,
-          codigoClima: cod,
-        ),
-      );
-    }
-
-    // Probabilidad de lluvia del día actual
-    final lluviaHoy = listaPronostico.isNotEmpty
-        ? listaPronostico.first.probabilidadLluvia
-        : 0;
+    final actual = json['current'] as Map<String, dynamic>? ?? {};
+    final diario = json['daily'] as Map<String, dynamic>? ?? {};
+    final pronostico = _leerPronostico(diario);
+    final temperatura = (actual['temperature_2m'] as num?)?.toDouble() ?? 0.0;
+    final lluviaHoy = pronostico.isEmpty
+        ? 0
+        : pronostico.first.probabilidadLluvia;
 
     return ClimaModelo(
       nombreLugar: nombreLugar,
-      temperatura: (current['temperature_2m'] as num?)?.toDouble() ?? 0.0,
-      sensacionTermica: (current['apparent_temperature'] as num?)?.toDouble() ??
-          (current['temperature_2m'] as num?)?.toDouble() ??
-          0.0,
-      humedad: (current['relative_humidity_2m'] as num?)?.toInt() ?? 0,
-      presionAtmosferica: (current['surface_pressure'] as num?)?.toDouble() ?? 1013.25,
-      velocidadViento: (current['wind_speed_10m'] as num?)?.toDouble() ?? 0.0,
+      temperatura: temperatura,
+      sensacionTermica:
+          (actual['apparent_temperature'] as num?)?.toDouble() ?? temperatura,
+      humedad: (actual['relative_humidity_2m'] as num?)?.toInt() ?? 0,
+      presionAtmosferica:
+          (actual['surface_pressure'] as num?)?.toDouble() ?? 1013.25,
+      velocidadViento: (actual['wind_speed_10m'] as num?)?.toDouble() ?? 0.0,
       probabilidadLluvia: lluviaHoy,
-      codigoClima: (current['weather_code'] as num?)?.toInt() ?? 0,
-      esDeDia: ((current['is_day'] as num?)?.toInt() ?? 1) == 1,
+      codigoClima: (actual['weather_code'] as num?)?.toInt() ?? 0,
+      esDeDia: ((actual['is_day'] as num?)?.toInt() ?? 1) == 1,
       latitud: latitud,
       longitud: longitud,
-      pronosticoSemanal: listaPronostico,
+      pronosticoSemanal: pronostico,
       fechaConsulta: DateTime.now(),
     );
+  }
+
+  static List<PronosticoDiaModelo> _leerPronostico(
+    Map<String, dynamic> diario,
+  ) {
+    final fechas = (diario['time'] as List?)?.cast<String>() ?? [];
+    final maximas = diario['temperature_2m_max'] as List? ?? [];
+    final minimas = diario['temperature_2m_min'] as List? ?? [];
+    final probabilidadLluvia =
+        diario['precipitation_probability_max'] as List? ?? [];
+    final codigos = diario['weather_code'] as List? ?? [];
+
+    final pronostico = <PronosticoDiaModelo>[];
+    for (var i = 0; i < fechas.length; i++) {
+      pronostico.add(
+        PronosticoDiaModelo(
+          fecha: DateTime.tryParse(fechas[i]) ?? DateTime.now(),
+          tempMaxima: _numeroDelDia(maximas, i)?.toDouble() ?? 0.0,
+          tempMinima: _numeroDelDia(minimas, i)?.toDouble() ?? 0.0,
+          probabilidadLluvia:
+              _numeroDelDia(probabilidadLluvia, i)?.toInt() ?? 0,
+          codigoClima: _numeroDelDia(codigos, i)?.toInt() ?? 0,
+        ),
+      );
+    }
+    return pronostico;
+  }
+
+  static num? _numeroDelDia(List valores, int dia) {
+    return dia < valores.length ? valores[dia] as num? : null;
   }
 
   @override
@@ -110,4 +113,3 @@ class ClimaModelo extends Equatable {
     fechaConsulta,
   ];
 }
-

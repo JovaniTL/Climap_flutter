@@ -10,7 +10,7 @@
 ![API](https://img.shields.io/badge/API-Open--Meteo-orange)
 ![Android](https://img.shields.io/badge/Plataforma-Android%20%7C%20Web%20%7C%20Desktop-3DDC84?logo=android&logoColor=white)
 ![Analyze](https://img.shields.io/badge/flutter%20analyze-0%20issues-brightgreen)
-![Tests](https://img.shields.io/badge/tests-14%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-11%20passing-brightgreen)
 
 [Características](#-características-principales) · [Diferenciador](#-diferenciador-innovador) · [Capturas](#-capturas-en-dispositivo-real) · [Arquitectura](#-arquitectura-y-tecnologías) · [Instalación](#-instalación-y-ejecución)
 
@@ -118,6 +118,8 @@ flowchart LR
     MAP["VistaMapa (flutter_map)"] -->|"Tiles"| OSM["OpenStreetMap"]
 ```
 
+La raíz de la aplicación (`MiAplicacionClima` en `lib/main.dart`) instancia y comparte un único `ClimaApiServicio` —inyectado en `ClimaBloc`, `ComparacionCubit` y `VistaMapa`, y cerrado en `dispose()`— y delega el tema Material Design 3 a `AppTema` (`lib/config/tema/app_tema.dart`).
+
 ### Stack técnico
 * **Gestor de estado:** [`flutter_bloc`](https://pub.dev/packages/flutter_bloc) (`^8.1.6`) + [`equatable`](https://pub.dev/packages/equatable) (`^2.0.5`)
 * **Cliente HTTP:** [`http`](https://pub.dev/packages/http) (`^1.2.2`)
@@ -132,7 +134,10 @@ flowchart LR
 
 ```text
 lib/
-├── main.dart                                # Configuración Material 3, tema claro/oscuro y BLoCs
+├── main.dart                                # Ciclo de vida de ClimaApiServicio, BLoCs y App
+├── config/
+│   └── tema/
+│       └── app_tema.dart                    # Configuración centralizada de temas Material 3
 ├── bloc/
 │   ├── clima_bloc.dart                      # Búsqueda, consulta por ciudad/mapa y reintentos
 │   ├── clima_event.dart                     # Eventos del flujo principal
@@ -161,6 +166,11 @@ lib/
         ├── monito_clima_widget.dart         # Tarjeta visual temática con memes climáticos
         ├── rejilla_detalles_clima.dart      # Humedad, lluvia, viento y presión
         └── tarjeta_clima_actual.dart        # Tarjeta principal con gradiente dinámico
+
+test/
+├── flujos_clima_test.dart                   # Pruebas de integración BLoC, Cubit y servicio HTTP
+├── utilidades_clima_test.dart               # Pruebas de RecomendadorClima y EvaluadorActividades
+└── widget_test.dart                         # Carga inicial de MiAplicacionClima
 ```
 
 </details>

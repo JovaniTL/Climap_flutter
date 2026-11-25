@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -158,6 +159,193 @@ void main() {
         'clima:19.4',
         'clima:19.7',
       ]);
+    },
+  );
+
+  test(
+    'Reintentar después de fallar por coordenadas vuelve a consultar coordenadas',
+    () async {
+      final llamadas = <String>[];
+      var intentos = 0;
+      final srv = ClimaApiServicio(
+        clienteHttp: MockClient((request) async {
+          final url = request.url;
+          if (url.path.endsWith('/search')) {
+            llamadas.add('search:${url.queryParameters['name']}');
+            return _json({'results': []});
+          }
+          llamadas.add('clima:${url.queryParameters['latitude']}');
+          intentos++;
+          if (intentos == 1) {
+            throw const SocketException('Sin red');
+          }
+          return _json({
+            'current': {'temperature_2m': 20, 'relative_humidity_2m': 60},
+            'daily': {
+              'time': ['2026-11-24'],
+              'temperature_2m_max': [24],
+              'temperature_2m_min': [12],
+              'precipitation_probability_max': [10],
+              'weather_code': [0],
+            },
+          });
+        }),
+      );
+      addTearDown(srv.cerrar);
+
+      final bloc = ClimaBloc(servicio: srv);
+      addTearDown(bloc.close);
+
+      final fallo = await _consultar(
+        bloc,
+        const ConsultarClimaPorCoordenadasEvent(
+          latitud: 19.4326,
+          longitud: -99.1332,
+        ),
+      );
+      expect(fallo.estado, EstadoClima.error);
+      expect(fallo.tipoError, TipoErrorClima.sinInternet);
+
+      final reintento = await _consultar(bloc, const ReintentarConsultaEvent());
+      expect(reintento.estado, EstadoClima.exitoso);
+      expect(reintento.clima!.nombreLugar, 'Coordenadas (19.43, -99.13)');
+      expect(llamadas, ['clima:19.4326', 'clima:19.4326']);
+    },
+  );
+
+  test(
+    'El servicio clasifica ClientException como sinInternet y FormatException como errorServidor',
+    () async {
+      final srv = ClimaApiServicio(
+        clienteHttp: MockClient((request) async {
+          if (request.url.path.endsWith('/search')) {
+            final nombre = request.url.queryParameters['name'];
+            if (nombre == 'ClienteError') {
+              throw http.ClientException('Fallo de conexión');
+            }
+            return http.Response('no es json', 200);
+          }
+          if (request.url.queryParameters['latitude'] == '1.0') {
+            throw http.ClientException('Fallo de red en pronóstico');
+          }
+          return http.Response('{invalido', 200);
+        }),
+      );
+      addTearDown(srv.cerrar);
+
+      await expectLater(
+        srv.buscarCiudades('ClienteError'),
+        throwsA(
+          isA<ClimaExcepcion>().having(
+            (e) => e.tipo,
+            'tipo',
+            TipoErrorClima.sinInternet,
+          ),
+        ),
+      );
+      await expectLater(
+        srv.buscarCiudades('JsonInvalido'),
+        throwsA(
+          isA<ClimaExcepcion>().having(
+            (e) => e.tipo,
+            'tipo',
+            TipoErrorClima.errorServidor,
+          ),
+        ),
+      );
+      await expectLater(
+        srv.obtenerClima(latitud: 1.0, longitud: 2.0, nombreLugar: 'Prueba'),
+        throwsA(
+          isA<ClimaExcepcion>().having(
+            (e) => e.tipo,
+            'tipo',
+            TipoErrorClima.sinInternet,
+          ),
+        ),
+      );
+      await expectLater(
+        srv.obtenerClima(latitud: 3.0, longitud: 4.0, nombreLugar: 'Prueba'),
+        throwsA(
+          isA<ClimaExcepcion>().having(
+            (e) => e.tipo,
+            'tipo',
+            TipoErrorClima.errorServidor,
+          ),
+        ),
+      );
+    },
+  );
+
+  test(
+    'Consultar clima limpia cargandoSugerencias y descarta sugerencias obsoletas',
+    () async {
+      final completerSugerencias = Completer<http.Response>();
+      final srv = ClimaApiServicio(
+        clienteHttp: MockClient((request) async {
+          if (request.url.path.endsWith('/search')) {
+            final nombre = request.url.queryParameters['name'];
+            if (nombre == 'More') {
+              return completerSugerencias.future;
+            }
+            return _json({
+              'results': [
+                {
+                  'name': nombre,
+                  'admin1': 'Oslo',
+                  'country': 'Noruega',
+                  'latitude': 59.9,
+                  'longitude': 10.7,
+                },
+              ],
+            });
+          }
+          return _json({
+            'current': {'temperature_2m': 2, 'relative_humidity_2m': 75},
+            'daily': {
+              'time': ['2026-11-24'],
+              'temperature_2m_max': [4],
+              'temperature_2m_min': [-1],
+              'precipitation_probability_max': [5],
+              'weather_code': [0],
+            },
+          });
+        }),
+      );
+      addTearDown(srv.cerrar);
+
+      final bloc = ClimaBloc(servicio: srv);
+      addTearDown(bloc.close);
+
+      final cargandoSug = bloc.stream.firstWhere((e) => e.cargandoSugerencias);
+      bloc.add(const BuscarSugerenciasEvent('More'));
+      await cargandoSug;
+
+      final resultado = await _consultar(
+        bloc,
+        const ConsultarClimaPorTextoEvent('Oslo'),
+      );
+      expect(resultado.estado, EstadoClima.exitoso);
+      expect(resultado.cargandoSugerencias, isFalse);
+      expect(resultado.sugerencias, isEmpty);
+
+      completerSugerencias.complete(
+        _json({
+          'results': [
+            {
+              'name': 'Morelia',
+              'admin1': 'Michoacán',
+              'country': 'México',
+              'latitude': 19.7,
+              'longitude': -101.2,
+            },
+          ],
+        }),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(bloc.state.cargandoSugerencias, isFalse);
+      expect(bloc.state.sugerencias, isEmpty);
+      expect(bloc.state.clima!.nombreLugar, 'Oslo, Oslo, Noruega');
     },
   );
 }

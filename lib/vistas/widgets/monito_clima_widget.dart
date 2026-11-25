@@ -34,48 +34,67 @@ class MonitoClimaWidget extends StatelessWidget {
 
   Widget _ilustracion(_DatosMonito datosMonito) {
     return Container(
-      width: 90,
-      height: 90,
+      width: 92,
+      height: 92,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            datosMonito.colorFondo.withAlpha(204),
-            datosMonito.colorFondo,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: datosMonito.colorFondo.withAlpha(115),
+          width: 2,
         ),
-        shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: datosMonito.colorFondo.withAlpha(89),
+            color: datosMonito.colorFondo.withAlpha(64),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Stack(
-        alignment: Alignment.center,
+        fit: StackFit.expand,
         children: [
-          Image.asset(
-            datosMonito.rutaImagenAsset,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(
-                datosMonito.iconoPrincipal,
-                size: 46,
-                color: Colors.white,
-              );
-            },
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              datosMonito.rutaImagenAsset,
+              width: 92,
+              height: 92,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        datosMonito.colorFondo.withAlpha(204),
+                        datosMonito.colorFondo,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Icon(
+                    datosMonito.iconoPrincipal,
+                    size: 46,
+                    color: Colors.white,
+                  ),
+                );
+              },
+            ),
           ),
           Positioned(
             bottom: 4,
             right: 4,
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(51),
+                    blurRadius: 4,
+                  ),
+                ],
               ),
               child: Icon(
                 datosMonito.iconoAccesorio,
@@ -128,7 +147,8 @@ class MonitoClimaWidget extends StatelessWidget {
 
   _DatosMonito _obtenerDatosMonito(ClimaModelo clima) {
     if (clima.probabilidadLluvia >= 40 ||
-        (clima.codigoClima >= 51 && clima.codigoClima <= 82)) {
+        (clima.codigoClima >= 51 && clima.codigoClima <= 82) ||
+        clima.codigoClima >= 95) {
       return const _DatosMonito(
         etiquetaEstado: 'Día Lluvioso 🌧️',
         tituloAccion: 'Monito con paraguas e impermeable',

@@ -38,7 +38,7 @@ class _MiAplicacionClimaState extends State<MiAplicacionClima> {
         ),
       ],
       child: MaterialApp(
-        title: 'App Clima',
+        title: 'CliMap',
         debugShowCheckedModeBanner: false,
         theme: const AppTema(brillo: Brightness.light).getTema(),
         darkTheme: const AppTema(brillo: Brightness.dark).getTema(),

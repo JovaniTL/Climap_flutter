@@ -118,7 +118,7 @@ class _VistaMapaState extends State<VistaMapa> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.app_clima',
+                userAgentPackageName: 'com.example.climap_flutter',
               ),
             ],
           ),
@@ -266,8 +266,14 @@ class _ResumenClimaMapa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icono = ClimaTraductor.obtenerIcono(clima.codigoClima);
-    final descripcion = ClimaTraductor.obtenerDescripcion(clima.codigoClima);
+    final icono = ClimaTraductor.obtenerIcono(
+      clima.codigoClima,
+      esDeDia: clima.esDeDia,
+    );
+    final descripcion = ClimaTraductor.obtenerDescripcion(
+      clima.codigoClima,
+      esDeDia: clima.esDeDia,
+    );
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -314,7 +320,7 @@ class _ResumenClimaMapa extends StatelessWidget {
                       '$descripcion • ${clima.temperatura.round()}°C (Sensación ${clima.sensacionTermica.toStringAsFixed(1)}°C)',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],

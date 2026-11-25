@@ -51,9 +51,13 @@ class _ContenidoClima extends StatelessWidget {
           return _VistaError(
             mensaje: state.mensajeError ?? 'Ocurrió un error inesperado.',
             tipo: state.tipoError,
-            onReintentar: () {
-              context.read<ClimaBloc>().add(const ReintentarConsultaEvent());
-            },
+            onReintentar: state.ultimoEventoConsulta != null
+                ? () {
+                    context.read<ClimaBloc>().add(
+                      const ReintentarConsultaEvent(),
+                    );
+                  }
+                : null,
           );
         }
 
@@ -121,11 +125,14 @@ class _InicioClima extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
                 'Escribe el nombre de tu ciudad arriba (ej. Zitácuaro, Morelia, CDMX) y pulsa "Buscar" para obtener el clima, recomendaciones y el monito interactivo.',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -217,12 +224,12 @@ class _ClimaConsultado extends StatelessWidget {
 class _VistaError extends StatelessWidget {
   final String mensaje;
   final TipoErrorClima? tipo;
-  final VoidCallback onReintentar;
+  final VoidCallback? onReintentar;
 
   const _VistaError({
     required this.mensaje,
     required this.tipo,
-    required this.onReintentar,
+    this.onReintentar,
   });
 
   @override
@@ -283,24 +290,29 @@ class _VistaError extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               mensaje,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: onReintentar,
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Reintentar'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+            if (onReintentar != null) ...[
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: onReintentar,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Reintentar'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

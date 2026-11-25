@@ -196,21 +196,22 @@ class _EstadoComparacion extends StatelessWidget {
         }
 
         if (state.mensajeError != null) {
+          final colorScheme = Theme.of(context).colorScheme;
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
+              color: colorScheme.errorContainer,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(color: colorScheme.error.withAlpha(102)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline, color: Colors.red),
+                Icon(Icons.error_outline, color: colorScheme.error),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     state.mensajeError!,
-                    style: const TextStyle(color: Colors.red),
+                    style: TextStyle(color: colorScheme.onErrorContainer),
                   ),
                 ),
               ],
@@ -263,25 +264,37 @@ class _ResultadoComparacion extends StatelessWidget {
         _TarjetaVeredicto(veredicto: veredicto),
         const SizedBox(height: 18),
 
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _TarjetaResumenCiudad(
-                clima: clima1,
-                puntaje: puntaje1,
-                colorTema: Colors.blueAccent,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _TarjetaResumenCiudad(
-                clima: clima2,
-                puntaje: puntaje2,
-                colorTema: Colors.orangeAccent,
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final tarjeta1 = _TarjetaResumenCiudad(
+              clima: clima1,
+              puntaje: puntaje1,
+              colorTema: Colors.blueAccent,
+            );
+            final tarjeta2 = _TarjetaResumenCiudad(
+              clima: clima2,
+              puntaje: puntaje2,
+              colorTema: Colors.orangeAccent,
+            );
+            if (constraints.maxWidth < 360) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  tarjeta1,
+                  const SizedBox(height: 12),
+                  tarjeta2,
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: tarjeta1),
+                const SizedBox(width: 12),
+                Expanded(child: tarjeta2),
+              ],
+            );
+          },
         ),
 
         const SizedBox(height: 20),
@@ -323,12 +336,14 @@ class _TarjetaVeredicto extends StatelessWidget {
             children: [
               Icon(Icons.stars_rounded, color: Colors.amberAccent, size: 24),
               SizedBox(width: 8),
-              Text(
-                'Veredicto de Actividades al Aire Libre',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+              Expanded(
+                child: Text(
+                  'Veredicto de Actividades al Aire Libre',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ],
@@ -431,8 +446,15 @@ class _TarjetaResumenCiudad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icono = ClimaTraductor.obtenerIcono(clima.codigoClima);
-    final descripcion = ClimaTraductor.obtenerDescripcion(clima.codigoClima);
+    final colorScheme = Theme.of(context).colorScheme;
+    final icono = ClimaTraductor.obtenerIcono(
+      clima.codigoClima,
+      esDeDia: clima.esDeDia,
+    );
+    final descripcion = ClimaTraductor.obtenerDescripcion(
+      clima.codigoClima,
+      esDeDia: clima.esDeDia,
+    );
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -466,9 +488,13 @@ class _TarjetaResumenCiudad extends StatelessWidget {
           ),
           Text(
             descripcion,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
             maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
           Column(
@@ -488,7 +514,7 @@ class _TarjetaResumenCiudad extends StatelessWidget {
                   value: puntaje / 100.0,
                   minHeight: 6,
                   color: puntaje >= 60 ? Colors.green : Colors.orange,
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
                 ),
               ),
             ],

@@ -8,6 +8,7 @@ import 'clima_state.dart';
 
 class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
   final ClimaApiServicio _servicio;
+  int _idSolicitudSugerencias = 0;
 
   ClimaBloc({ClimaApiServicio? servicio})
     : _servicio = servicio ?? ClimaApiServicio(),
@@ -24,6 +25,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     BuscarSugerenciasEvent event,
     Emitter<ClimaEstado> emit,
   ) async {
+    final idSolicitud = ++_idSolicitudSugerencias;
     final texto = event.texto.trim();
     if (texto.length < 2) {
       emit(state.copyWith(sugerencias: const [], cargandoSugerencias: false));
@@ -34,8 +36,10 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
 
     try {
       final ciudades = await _servicio.buscarCiudades(texto);
+      if (idSolicitud != _idSolicitudSugerencias) return;
       emit(state.copyWith(sugerencias: ciudades, cargandoSugerencias: false));
     } catch (_) {
+      if (idSolicitud != _idSolicitudSugerencias) return;
       emit(state.copyWith(sugerencias: const [], cargandoSugerencias: false));
     }
   }
@@ -44,6 +48,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     LimpiarSugerenciasEvent event,
     Emitter<ClimaEstado> emit,
   ) {
+    _idSolicitudSugerencias++;
     emit(state.copyWith(sugerencias: const [], cargandoSugerencias: false));
   }
 
@@ -53,11 +58,14 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
   ) async {
     final texto = event.nombreCiudad.trim();
     if (texto.isEmpty) {
+      _idSolicitudSugerencias++;
       emit(
         state.copyWith(
           estado: EstadoClima.error,
+          cargandoSugerencias: false,
           mensajeError: 'Por favor, escribe el nombre de una ciudad.',
           tipoError: TipoErrorClima.ciudadNoEncontrada,
+          limpiarUltimoEvento: true,
         ),
       );
       return;
@@ -65,7 +73,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
 
     await _cargarClima(
       emit,
-      consulta: texto,
+      eventoConsulta: event,
       obtenerClima: () async {
         final ciudades = await _servicio.buscarCiudades(texto);
         return _servicio.obtenerClimaDeCiudad(ciudades.first);
@@ -81,7 +89,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     final ciudad = event.ciudad;
     return _cargarClima(
       emit,
-      consulta: ciudad.nombreCompleto,
+      eventoConsulta: event,
       obtenerClima: () => _servicio.obtenerClimaDeCiudad(ciudad),
       errorInesperado: 'No se pudo cargar el clima de la ciudad seleccionada.',
     );
@@ -99,7 +107,7 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
 
     return _cargarClima(
       emit,
-      consulta: nombre,
+      eventoConsulta: event,
       obtenerClima: () => _servicio.obtenerClima(
         latitud: latitud,
         longitud: longitud,
@@ -112,16 +120,18 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
 
   Future<void> _cargarClima(
     Emitter<ClimaEstado> emit, {
-    required String consulta,
+    required ClimaEvent eventoConsulta,
     required Future<ClimaModelo> Function() obtenerClima,
     required String errorInesperado,
   }) async {
+    _idSolicitudSugerencias++;
     emit(
       state.copyWith(
         estado: EstadoClima.cargando,
         sugerencias: const [],
+        cargandoSugerencias: false,
         limpiarError: true,
-        ultimaConsulta: consulta,
+        ultimoEventoConsulta: eventoConsulta,
       ),
     );
 
@@ -160,9 +170,9 @@ class ClimaBloc extends Bloc<ClimaEvent, ClimaEstado> {
     ReintentarConsultaEvent event,
     Emitter<ClimaEstado> emit,
   ) {
-    final consulta = state.ultimaConsulta;
-    if (consulta != null && consulta.isNotEmpty) {
-      add(ConsultarClimaPorTextoEvent(consulta));
+    final ultimoEvento = state.ultimoEventoConsulta;
+    if (ultimoEvento != null) {
+      add(ultimoEvento);
     }
   }
 }

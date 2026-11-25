@@ -110,7 +110,10 @@ class _ItemDetalle extends StatelessWidget {
               children: [
                 Text(
                   etiqueta,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(

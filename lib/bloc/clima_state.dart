@@ -1,16 +1,12 @@
 import 'package:equatable/equatable.dart';
+
 import '../modelos/ciudad_modelo.dart';
 import '../modelos/clima_modelo.dart';
 import '../modelos/recomendacion_modelo.dart';
 import '../servicios/clima_api_servicio.dart';
 import 'clima_event.dart';
 
-enum EstadoClima {
-  inicial,
-  cargando,
-  exitoso,
-  error,
-}
+enum EstadoClima { inicial, cargando, exitoso, error }
 
 class ClimaEstado extends Equatable {
   final EstadoClima estado;
@@ -71,4 +67,3 @@ class ClimaEstado extends Equatable {
     ultimoEventoConsulta,
   ];
 }
-

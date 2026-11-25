@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Traduce los códigos estándar WMO de Open-Meteo a texto en español, iconos y colores de fondo.
 class ClimaTraductor {
   ClimaTraductor._();
 
-  /// Obtiene la descripción textual del clima en español.
   static String obtenerDescripcion(int codigoWmo, {bool esDeDia = true}) {
     switch (codigoWmo) {
       case 0:
@@ -56,7 +54,6 @@ class ClimaTraductor {
     }
   }
 
-  /// Obtiene un icono representativo de Material Design.
   static IconData obtenerIcono(int codigoWmo, {bool esDeDia = true}) {
     switch (codigoWmo) {
       case 0:
@@ -101,28 +98,24 @@ class ClimaTraductor {
     }
   }
 
-  /// Colores de degradado para la cabecera o fondo según el clima.
-  static List<Color> obtenerGradienteFondo(int codigoWmo, {bool esDeDia = true}) {
+  static List<Color> obtenerGradienteFondo(
+    int codigoWmo, {
+    bool esDeDia = true,
+  }) {
     if (!esDeDia) {
       return const [Color(0xFF1A2130), Color(0xFF0F172A)];
     }
 
     if (codigoWmo == 0 || codigoWmo == 1) {
-      // Soleado / Despejado
       return const [Color(0xFFFF9800), Color(0xFF2196F3)];
     } else if (codigoWmo == 2 || codigoWmo == 3) {
-      // Nublado
       return const [Color(0xFF607D8B), Color(0xFF455A64)];
     } else if (codigoWmo >= 51 && codigoWmo <= 82) {
-      // Lluvioso
       return const [Color(0xFF3F51B5), Color(0xFF283593)];
     } else if (codigoWmo >= 95) {
-      // Tormenta
       return const [Color(0xFF311B92), Color(0xFF1A237E)];
     } else {
-      // Templado neutro
       return const [Color(0xFF1976D2), Color(0xFF0D47A1)];
     }
   }
 }
-

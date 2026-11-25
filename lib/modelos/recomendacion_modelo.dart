@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Modelo para mostrar tarjetas y chips de recomendaciones de acuerdo al clima actual.
 class RecomendacionModelo {
   final String titulo;
   final String descripcion;
@@ -14,4 +13,3 @@ class RecomendacionModelo {
     required this.color,
   });
 }
-

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+
 import '../modelos/clima_modelo.dart';
 import '../modelos/recomendacion_modelo.dart';
 
-/// Genera recomendaciones personalizadas y prácticas de acuerdo al clima actual.
 class RecomendadorClima {
   RecomendadorClima._();
 
   static List<RecomendacionModelo> generarRecomendaciones(ClimaModelo clima) {
     final List<RecomendacionModelo> recomendaciones = [];
 
-    // 1. Recomendaciones por Lluvia
-    if (clima.probabilidadLluvia >= 40 || (clima.codigoClima >= 51 && clima.codigoClima <= 82)) {
+    if (clima.probabilidadLluvia >= 40 ||
+        (clima.codigoClima >= 51 && clima.codigoClima <= 82)) {
       recomendaciones.add(
         const RecomendacionModelo(
           titulo: 'Lleva paraguas o impermeable',
@@ -21,7 +21,6 @@ class RecomendadorClima {
       );
     }
 
-    // 2. Recomendaciones por Calor
     if (clima.temperatura >= 26.0) {
       recomendaciones.add(
         const RecomendacionModelo(
@@ -33,7 +32,6 @@ class RecomendadorClima {
       );
     }
 
-    // 3. Recomendaciones por Frío
     if (clima.temperatura < 15.0) {
       recomendaciones.add(
         const RecomendacionModelo(
@@ -45,7 +43,6 @@ class RecomendadorClima {
       );
     }
 
-    // 4. Recomendaciones por Viento
     if (clima.velocidadViento >= 22.0) {
       recomendaciones.add(
         const RecomendacionModelo(
@@ -57,7 +54,6 @@ class RecomendadorClima {
       );
     }
 
-    // 5. Recomendaciones por Tormenta Eléctrica
     if (clima.codigoClima >= 95) {
       recomendaciones.add(
         const RecomendacionModelo(
@@ -69,7 +65,6 @@ class RecomendadorClima {
       );
     }
 
-    // 6. Recomendación de clima ideal para salir
     if (clima.temperatura >= 16.0 &&
         clima.temperatura <= 25.0 &&
         clima.probabilidadLluvia < 30 &&
@@ -84,7 +79,6 @@ class RecomendadorClima {
       );
     }
 
-    // Si no entró ninguna condición extrema, agregamos un consejo de bienestar general
     if (recomendaciones.isEmpty) {
       recomendaciones.add(
         const RecomendacionModelo(
@@ -99,4 +93,3 @@ class RecomendadorClima {
     return recomendaciones;
   }
 }
-

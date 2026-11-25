@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Modelo que representa una ciudad o ubicación encontrada mediante la API de geocodificación.
 class CiudadModelo extends Equatable {
   final String nombre;
   final String? estado;
@@ -16,7 +15,6 @@ class CiudadModelo extends Equatable {
     required this.longitud,
   });
 
-  /// Crea una instancia a partir del JSON que devuelve Open-Meteo Geocoding API.
   factory CiudadModelo.fromOpenMeteoJson(Map<String, dynamic> json) {
     return CiudadModelo(
       nombre: json['name'] as String? ?? 'Ubicación desconocida',
@@ -27,12 +25,13 @@ class CiudadModelo extends Equatable {
     );
   }
 
-  /// Devuelve el nombre completo legible (ejemplo: "Zitácuaro, Michoacán, México").
   String get nombreCompleto {
+    final region = estado?.trim() ?? '';
+    final nombrePais = pais.trim();
     final partes = <String>[
       nombre,
-      if (estado != null && estado!.trim().isNotEmpty) estado!.trim(),
-      if (pais.trim().isNotEmpty) pais.trim(),
+      if (region.isNotEmpty) region,
+      if (nombrePais.isNotEmpty) nombrePais,
     ];
     return partes.join(', ');
   }
@@ -40,4 +39,3 @@ class CiudadModelo extends Equatable {
   @override
   List<Object?> get props => [nombre, estado, pais, latitud, longitud];
 }
-

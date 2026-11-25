@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../modelos/clima_modelo.dart';
 import '../../utilidades/clima_traductor.dart';
 
-/// Tarjeta principal con el clima actual, gradiente temático e información central.
 class TarjetaClimaActual extends StatelessWidget {
   final ClimaModelo clima;
 
@@ -35,7 +35,7 @@ class TarjetaClimaActual extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: colores.first.withValues(alpha: 0.35),
+            color: colores.first.withAlpha(89),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -43,7 +43,6 @@ class TarjetaClimaActual extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Nombre de la ubicación
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -66,7 +65,6 @@ class TarjetaClimaActual extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
-          // Icono y Temperatura grande
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,7 +84,6 @@ class TarjetaClimaActual extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Descripción en español
           Text(
             descripcion,
             style: const TextStyle(
@@ -97,11 +94,10 @@ class TarjetaClimaActual extends StatelessWidget {
           ),
           const SizedBox(height: 6),
 
-          // Sensación térmica
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withAlpha(51),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -118,4 +114,3 @@ class TarjetaClimaActual extends StatelessWidget {
     );
   }
 }
-
